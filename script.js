@@ -10,7 +10,7 @@ const completeList = document.getElementById('complete-list');
 const onHoldList = document.getElementById('on-hold-list');
 
 // Items
-
+let updatedOnLoad = false;
 
 // Initialize Arrays
 let backlogListArray = [];
@@ -37,9 +37,6 @@ function getSavedColumns() {
   }
 }
 
-getSavedColumns();
-updateSavedColumns();
-
 // Set localStorage Arrays
 function updateSavedColumns() {
   listArray = [backlogListArray, progressListArray, completeListArray, onHoldListArray];
@@ -51,30 +48,48 @@ function updateSavedColumns() {
 
 // Create DOM Elements for each list item
 function createItemEl(columnEl, column, item, index) {
-  console.log('columnEl:', columnEl);
-  console.log('column:', column);
-  console.log('item:', item);
-  console.log('index:', index);
+  // console.log('columnEl:', columnEl);
+  // console.log('column:', column);
+  // console.log('item:', item);
+  // console.log('index:', index);
   // List Item
   const listEl = document.createElement('li');
   listEl.classList.add('drag-item');
-
+  listEl.textContent = item;
+  // Append items
+  columnEl.appendChild(listEl);
 }
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
   // Check localStorage once
-
+  if (!updatedOnLoad) {
+    getSavedColumns();
+  }
   // Backlog Column
-
+  backlogList.textContent = "";
+  backlogListArray.forEach((backlogItem, i) => {
+    createItemEl(backlogList, 0, backlogItem, i);
+  });
   // Progress Column
-
+  progressList.textContent = "";
+  progressListArray.forEach((progressItem, i) => {
+    createItemEl(progressList, 0, progressItem, i);
+  });
   // Complete Column
-
+  completeList.textContent = "";
+  completeListArray.forEach((completeItem, i) => {
+    createItemEl(completeList, 0, completeItem, i);
+  });
   // On Hold Column
-
+  onHoldList.textContent = "";
+  onHoldListArray.forEach((onHoldItem, i) => {
+    createItemEl(onHoldList, 0, onHoldItem, i);
+  });
   // Run getSavedColumns only once, Update Local Storage
 
 
 }
 
+// On load run updateDom()
+updateDOM();
