@@ -3,7 +3,7 @@ const saveItemBtns = document.querySelectorAll('.solid');
 const addItemContainers = document.querySelectorAll('.add-container');
 const addItems = document.querySelectorAll('.add-item');
 // Item Lists
-const itemLists = document.querySelectorAll('.drag-item-list');
+const columnList = document.querySelectorAll('.drag-item-list');
 const backlogList = document.getElementById('backlog-list');
 const progressList = document.getElementById('progress-list');
 const completeList = document.getElementById('complete-list');
@@ -20,7 +20,8 @@ let onHoldListArray = [];
 let listArray = [];
 
 // Drag Functionality
-
+let draggedItem;
+let currentColumn;
 
 // Get Arrays from localStorage if available, set default values if not
 function getSavedColumns() {
@@ -43,7 +44,7 @@ function updateSavedColumns() {
   const arrayNames = ["backlog", "progress", "complete", "onhold"];
   arrayNames.forEach((name, i) => {
     localStorage.setItem(`${name}Items`, JSON.stringify(listArray[i]));
-  })
+  });
 }
 
 // Create DOM Elements for each list item
@@ -56,6 +57,8 @@ function createItemEl(columnEl, column, item, index) {
   const listEl = document.createElement('li');
   listEl.classList.add('drag-item');
   listEl.textContent = item;
+  listEl.draggable = true;
+  listEl.setAttribute("ondragstart", "drag(event)");
   // Append items
   columnEl.appendChild(listEl);
 }
@@ -89,6 +92,35 @@ function updateDOM() {
   // Run getSavedColumns only once, Update Local Storage
 
 
+}
+
+// When item starts dragging 
+function drag(e) {
+  draggedItem = e.target;
+  console.log(draggedItem);
+}
+
+// Column allowing the item to be dropped
+function allowDrop(e) {
+  e.preventDefault();
+}
+
+// On item enters column
+function dragEnter(column) {
+  columnList[column].classList.add("over");
+  currentColumn = column;
+}
+
+// Dropping item in column
+function drop(e) {
+  e.preventDefault();
+  // Remove background colour and padding
+  columnList.forEach(column => {
+    column.classList.remove("over");
+  });
+  // Add item to the correct column
+  const parent = columnList[currentColumn];
+  parent.appendChild(draggedItem);
 }
 
 // On load run updateDom()
