@@ -90,6 +90,18 @@ function updateDOM() {
   updateSavedColumns();
 }
 
+// Add item to column list
+function addToColumn(column) {
+  const itemText = addItems[column].textContent;
+  if ( itemText.length) {
+    const selectedArray = listArray[column];
+    selectedArray.push(itemText);
+    addItems[column].textContent = "";
+    updateDOM();
+  }
+  return;
+}
+
 // Show Add item input
 function showInputBox(column) {
   addBtns[column].style.visibility = "hidden";
@@ -102,6 +114,7 @@ function hideInputBox(column) {
   addBtns[column].style.visibility = "visible";
   saveItemBtns[column].style.display = "none";
   addItemContainers[column].style.display = "none";
+  addToColumn(column);
 }
 
 // Allow arrays to reflect the drag and drop functionality
