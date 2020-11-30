@@ -31,10 +31,10 @@ function getSavedColumns() {
     completeListArray = JSON.parse(localStorage.completeItems);
     onHoldListArray = JSON.parse(localStorage.onHoldItems);
   } else {
-    backlogListArray = ['Release the course', 'Sit back and relax'];
-    progressListArray = ['Work on projects', 'Listen to music'];
-    completeListArray = ['Being cool', 'Getting stuff done'];
-    onHoldListArray = ['Being uncool'];
+    backlogListArray = [];
+    progressListArray = [];
+    completeListArray = [];
+    onHoldListArray = [];
   }
 }
 
@@ -47,6 +47,12 @@ function updateSavedColumns() {
   });
 }
 
+// Filter arrays to remove empty items
+function filterArray(array) {
+  const filteredArray = array.filter(item => item !== null);
+  return filteredArray;
+}
+
 // Create DOM Elements for each list item
 function createItemEl(columnEl, column, item, index) {
   // List Item
@@ -55,6 +61,9 @@ function createItemEl(columnEl, column, item, index) {
   listEl.textContent = item;
   listEl.draggable = true;
   listEl.setAttribute("ondragstart", "drag(event)");
+  listEl.contentEditable = "true";
+  listEl.id = index;
+  listEl.setAttribute("onfocusout", `updateItem(${index}, ${column})`);
   // Append items
   columnEl.appendChild(listEl);
 }
@@ -70,30 +79,45 @@ function updateDOM() {
   backlogListArray.forEach((backlogItem, i) => {
     createItemEl(backlogList, 0, backlogItem, i);
   });
+  backlogListArray = filterArray(backlogListArray);
   // Progress Column
   progressList.textContent = "";
   progressListArray.forEach((progressItem, i) => {
-    createItemEl(progressList, 0, progressItem, i);
+    createItemEl(progressList, 1, progressItem, i);
   });
+  progressListArray = filterArray(progressListArray);
   // Complete Column
   completeList.textContent = "";
   completeListArray.forEach((completeItem, i) => {
-    createItemEl(completeList, 0, completeItem, i);
+    createItemEl(completeList, 2, completeItem, i);
   });
+  completeListArray = filterArray(completeListArray);
   // On Hold Column
   onHoldList.textContent = "";
   onHoldListArray.forEach((onHoldItem, i) => {
-    createItemEl(onHoldList, 0, onHoldItem, i);
+    createItemEl(onHoldList, 3, onHoldItem, i);
   });
+  onHoldListArray = filterArray(onHoldListArray);
   // Run getSavedColumns only once, Update Local Storage
   updatedOnLoad = true;
   updateSavedColumns();
 }
 
+// Update item, delete if text content is 0 or less, or update the array with the new value
+function updateItem(id, column) {
+  const selectedArray = listArray[column];
+  const selectedColumnEl = columnList[column].children;
+  if (!selectedArray[id].textContent) {
+    delete selectedArray[id];
+  }
+  updateDOM();
+}
+
 // Add item to column list
 function addToColumn(column) {
   const itemText = addItems[column].textContent;
-  if ( itemText.length) {
+  // Only create a new li element if there is any text entered by the user
+  if (itemText.length) {
     const selectedArray = listArray[column];
     selectedArray.push(itemText);
     addItems[column].textContent = "";
